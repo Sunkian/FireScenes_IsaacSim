@@ -1,0 +1,4 @@
+Right/left offset: -0.000000 mm
+Up/down offset: 20.000000 mm
+Forward/back offset: 0.000000 mm
+Optical-axis angle: 0.000000000 degrees

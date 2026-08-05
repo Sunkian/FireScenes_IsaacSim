@@ -1,0 +1,15 @@
+RGB position: (-0.011640990530621844, 0.21355240951565913, 0.6112197628686001)
+Thermal position: (-0.011640990530621847, 0.21180929466070597, 0.6311436568304352)
+Thermal minus RGB: (-3.469446951953614e-18, -0.0017431148549531539, 0.019923893961835026)
+Camera-centre distance: 0.020000000000000115 m
+
+RGB forward: (1.4420128602663576e-16, 0.9961946980917455, 0.0871557427476579)
+Thermal forward: (1.4420128602663578e-16, 0.9961946980917455, 0.0871557427476579)
+
+Target configuration:
+horizontal offset = 0 mm
+vertical offset = +20 mm
+front/back offset = 0 mm
+orientation = parallel to RGB
+
+Status: provisional until physical calibration

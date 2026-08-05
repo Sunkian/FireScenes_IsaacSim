@@ -1,0 +1,11 @@
+# Generated simulation output
+output/
+
+# Python temporary files
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor/system files
+.vscode/
+.DS_Store

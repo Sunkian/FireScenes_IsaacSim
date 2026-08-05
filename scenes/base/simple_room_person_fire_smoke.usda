@@ -1,0 +1,501 @@
+#usda 1.0
+(
+    customLayerData = {
+        dictionary cameraSettings = {
+            dictionary Front = {
+                double3 position = (5, 0, 0)
+                double radius = 5
+            }
+            dictionary Perspective = {
+                double3 position = (-0.33588325064761826, 1.62463476118721, 1.1548406396814956)
+                double3 target = (0.13111885335988188, 0.39475486745016974, 0.7385761404299862)
+            }
+            dictionary Right = {
+                double3 position = (0, -5, 0)
+                double radius = 5
+            }
+            dictionary Top = {
+                double3 position = (0, 0, 5)
+                double radius = 5
+            }
+            string boundCamera = "/OmniverseKit_Persp"
+        }
+        dictionary metricsAssembler = {
+            int version = 1
+        }
+        dictionary omni_layer = {
+            string authoring_layer = "./simple_room_person_fire_smoke.usda"
+            dictionary locked = {
+            }
+            dictionary muteness = {
+            }
+        }
+        dictionary renderSettings = {
+            bool "rtx:ecoMode:enabled" = 0
+            bool "rtx:flow:enabled" = 1
+            bool "rtx:flow:pathTracingEnabled" = 1
+            bool "rtx:flow:rayTracedReflectionsEnabled" = 1
+            bool "rtx:flow:rayTracedTranslucencyEnabled" = 1
+            int "rtx:post:aa:op" = 1
+        }
+    }
+    defaultPrim = "World"
+    endTimeCode = 1000000
+    metersPerUnit = 1
+    startTimeCode = 0
+    timeCodesPerSecond = 60
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    def Xform "SensorRig"
+    {
+        quatd xformOp:orient = (1, 0, 0, 0)
+        double3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, 2.1440075851335174, -0.653494831339271)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Xform "Gemini335L" (
+            prepend references = @https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Sensors/Orbbec/Gemini335L/orbbec_gemini_335L.usd@
+        )
+        {
+            quatd xformOp:orient = (6.123233995736766e-17, -4.136796926459071e-17, 0.6755902076156604, 0.7372773368101241)
+            double3 xformOp:scale = (1, 1, 1)
+            double3 xformOp:translate = (0.012109009469378165, -1.9989933708465704, 1.2587182791068323)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            over "camera_ir_left"
+            {
+                over "Camera_Depth_Left"
+                {
+                    quatd xformOp:orient = (6.123234262925839e-17, 0, 1, 0)
+                    double3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0.08000004291534424)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                }
+            }
+
+            over "body"
+            {
+                over "COVER_GLASS"
+                {
+                    over "Mesh_1"
+                    {
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (0.001, 0.001, 0.001)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                over "UPPER_HOUS"
+                {
+                    over "Mesh_0"
+                    {
+                        float3 xformOp:rotateXYZ = (-90, 0, 0)
+                        float3 xformOp:scale = (0.001, 0.001, 0.001)
+                        double3 xformOp:translate = (0, 0.013981, -0.014019)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    }
+                }
+            }
+
+            over "camera_rgb"
+            {
+                token visibility = "inherited"
+
+                over "Camera_rgb"
+                {
+                    bool omni:kit:cameraLock = 0
+                    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -400)
+                    double3 xformOp:rotateYXZ = (0, 180, -0)
+                    double3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0.07999999999999996)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateYXZ", "xformOp:scale"]
+                }
+            }
+        }
+
+        def Camera "ThermalCamera"
+        {
+            float2 clippingRange = (0.01, 10000000)
+            float focalLength = 9.60086
+            float focusDistance = 400
+            custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -400)
+            float verticalAperture = 15.716249
+            quatd xformOp:orient = (0.7069990853988242, 0.7069990853988243, -0.012340714939825696, -0.012340714939825742)
+            double3 xformOp:scale = (1, 1, 1)
+            double3 xformOp:translate = (0.24744700154733867, -1.999086372912946, 1.2000000178813934)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        over "Fire" (
+            active = false
+        )
+        {
+        }
+    }
+
+    def "SimpleRoom" (
+        prepend references = @https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Environments/Simple_Room/simple_room.usd@
+    )
+    {
+        token visibility = "inherited"
+
+        over "Towel_Room01_window_288"
+        {
+            over "Towel_Room01_window"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (0.01, 0.01, 0.01)
+                double3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+            }
+        }
+
+        over "Towel_Room01_floor_bottom_218"
+        {
+            double3 xformOp:rotateZYX = (0, 0, 0)
+            double3 xformOp:scale = (1, 1, 1)
+            double3 xformOp:translate = (0, 1.305869970811531, -0.76956998279877)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZYX", "xformOp:scale"]
+        }
+    }
+
+    def Xform "Fire"
+    {
+        quatd xformOp:orient = (1, 0, 0, 0)
+        double3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def "Fire" (
+            append apiSchemas = ["SemanticsLabelsAPI:class"]
+            prepend references = @https://omniverse-content-staging.s3.us-west-2.amazonaws.com/Assets/Extensions/Samples/Flow/107.0/presets/Fire/Fire.usda@
+        )
+        {
+            token[] semantics:labels:class = ["fire"]
+            quatf xformOp:orient = (1, 0, 0, 0)
+            double xformOp:rotateX:unitsResolve = 90
+            float3 xformOp:scale = (1, 1, 1)
+            double3 xformOp:scale:unitsResolve = (0.01, 0.01, 0.01)
+            double3 xformOp:translate = (1.4487301449167531, 2.144007585133518, -0.653494831339271)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale", "xformOp:rotateX:unitsResolve", "xformOp:scale:unitsResolve"]
+
+            over "flowEmitterSphere"
+            {
+                int layer = 1
+                float radius = 1
+                bool radiusIsWorldSpace = 1
+                float3 velocity = (0, 0, 0)
+            }
+
+            over "flowSimulate"
+            {
+                custom bool enableHighPrecisionDensity = 0
+                custom bool enableHighPrecisionVelocity = 0
+                int layer = 1
+
+                over "advection"
+                {
+                    float3 gravity = (0, 0, -100)
+
+                    over "smoke"
+                    {
+                        float damping = 0.3
+                    }
+
+                    over "velocity"
+                    {
+                        float damping = 0.01
+                    }
+
+                    over "divergence"
+                    {
+                        float damping = 0.01
+                    }
+
+                    over "temperature"
+                    {
+                        float damping = 0
+                    }
+
+                    over "fuel"
+                    {
+                        float damping = 0
+                    }
+
+                    over "burn"
+                    {
+                        float damping = 0
+                    }
+                }
+
+                over "nanoVdbExport"
+                {
+                    custom bool interopEnabled = 0
+                }
+            }
+
+            over "flowOffscreen"
+            {
+                int layer = 1
+
+                over "debugVolume"
+                {
+                    custom bool applyPreShadow = 0
+                }
+            }
+
+            over "flowRender"
+            {
+                int layer = 1
+
+                def FlowRenderSettingsParams "renderSettings"
+                {
+                }
+            }
+        }
+    }
+
+    def Xform "Person"
+    {
+        quatd xformOp:orient = (1, 0, 0, 0)
+        double3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def "F_Medical_01" (
+            append apiSchemas = ["SemanticsLabelsAPI:class"]
+            prepend payload = @https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/People/Characters/F_Medical_01/F_Medical_01.usd@
+        )
+        {
+            token[] semantics:labels:class = ["person"]
+            double3 xformOp:rotateXYZ = (-84.77796046724396, 0, 0)
+            double3 xformOp:scale = (1, 1, 1)
+            double3 xformOp:translate = (-0.7436496683313671, 3.0549843311309814, -0.7695710062980694)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+    }
+
+    def Xform "Smoke"
+    {
+        quatd xformOp:orient = (1, 0, 0, 0)
+        double3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def "DenseSmoke" (
+            append apiSchemas = ["SemanticsLabelsAPI:class"]
+            prepend references = @https://omniverse-content-staging.s3.us-west-2.amazonaws.com/Assets/Extensions/Samples/Flow/107.0/presets/Smoke/DenseSmoke.usda@
+        )
+        {
+            token[] semantics:labels:class = ["smoke"]
+            quatf xformOp:orient = (1, 0, 0, 0)
+            double xformOp:rotateX:unitsResolve = 90
+            float3 xformOp:scale = (1, 1, 1)
+            double3 xformOp:scale:unitsResolve = (0.01, 0.01, 0.01)
+            double3 xformOp:translate = (0, 5.5783455953992895, -1.2386415438657238e-15)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale", "xformOp:rotateX:unitsResolve", "xformOp:scale:unitsResolve"]
+
+            over "flowEmitterSphere"
+            {
+                int layer = 2
+                float radius = 1
+                float3 velocity = (0, 0, 400)
+            }
+
+            over "flowSimulate"
+            {
+                custom bool enableHighPrecisionDensity = 0
+                custom bool enableHighPrecisionVelocity = 0
+                int layer = 2
+
+                over "advection"
+                {
+                    float3 gravity = (0, 0, -100)
+
+                    over "velocity"
+                    {
+                        float damping = 0.01
+                    }
+
+                    over "divergence"
+                    {
+                        float damping = 0.01
+                    }
+
+                    over "temperature"
+                    {
+                        float damping = 0
+                    }
+
+                    over "fuel"
+                    {
+                        float damping = 0
+                    }
+
+                    over "burn"
+                    {
+                        float damping = 0
+                    }
+
+                    over "smoke"
+                    {
+                        float damping = 0.3
+                    }
+                }
+
+                over "nanoVdbExport"
+                {
+                    custom bool interopEnabled = 0
+                }
+            }
+
+            over "flowOffscreen"
+            {
+                int layer = 2
+
+                over "debugVolume"
+                {
+                    custom bool applyPreShadow = 0
+                }
+            }
+
+            over "flowRender"
+            {
+                int layer = 2
+
+                def FlowRenderSettingsParams "renderSettings"
+                {
+                }
+            }
+        }
+    }
+
+    over "DenseSmoke" (
+        active = false
+    )
+    {
+    }
+}
+
+def Xform "Environment"
+{
+    quatd xformOp:orient = (1, 0, 0, 0)
+    double3 xformOp:scale = (1, 1, 1)
+    double3 xformOp:translate = (0, 0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+    def DistantLight "defaultLight" (
+        prepend apiSchemas = ["ShapingAPI"]
+    )
+    {
+        float inputs:angle = 1
+        float inputs:intensity = 3000
+        float inputs:shaping:cone:angle = 180
+        float inputs:shaping:cone:softness
+        float inputs:shaping:focus
+        color3f inputs:shaping:focusTint
+        asset inputs:shaping:ies:file
+        quatd xformOp:orient = (0.6532814824381883, 0.2705980500730985, 0.27059805007309845, 0.6532814824381882)
+        double3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+}
+
+def "Render" (
+    hide_in_stage_window = true
+    no_delete = true
+)
+{
+    def "OmniverseKit"
+    {
+        def "HydraTextures" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            def RenderProduct "omni_kit_widget_viewport_ViewportTexture_0" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </OmniverseKit_Persp>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:aa:op = "taa"
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+        }
+    }
+
+    def RenderSettings "OmniverseGlobalRenderSettings" (
+        prepend apiSchemas = ["OmniRtxSettingsGlobalRtAdvancedAPI_1", "OmniRtxSettingsGlobalPtAdvancedAPI_1"]
+        no_delete = true
+    )
+    {
+        rel products = [
+            </Render/OmniverseKit/HydraTextures/omni_kit_widget_viewport_ViewportTexture_0>,
+            </Render/OmniverseKit/HydraTextures/Replicator>,
+            </Render/OmniverseKit/HydraTextures/Replicator_01>,
+            </Render/OmniverseKit/HydraTextures/Replicator_02>,
+            </Render/OmniverseKit/HydraTextures/RGB_Camera>,
+            </Render/OmniverseKit/HydraTextures/IR_Left>,
+            </Render/OmniverseKit/HydraTextures/IR_Right>,
+            </Render/OmniverseKit/HydraTextures/Depth_Left>,
+            </Render/OmniverseKit/HydraTextures/Thermal>,
+        ]
+    }
+
+    def "Vars"
+    {
+        def RenderVar "LdrColor" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            uniform string sourceName = "LdrColor"
+        }
+    }
+}
+
+def Scope "Replicator"
+{
+    def OmniGraph "SDGPipeline"
+    {
+        token evaluationMode = "Automatic"
+        token evaluator:type = "execution"
+        token fabricCacheBacking = "StageWithoutHistory"
+        int2 fileFormatVersion = (1, 9)
+        custom int64 graph:variable:globalSeed (
+            customData = {
+                token scope = "private"
+            }
+            displayName = "globalSeed"
+        )
+        token pipelineStage = "pipelineStageSimulation"
+    }
+}
+
