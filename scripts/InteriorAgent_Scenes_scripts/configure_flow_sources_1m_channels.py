@@ -1,0 +1,438 @@
+"""
+configure_flow_sources_1m_channels.py
+
+Isaac Sim 5.1
+
+Keeps BOTH Flow source radii at 1.0 m and configures the native Flow channels
+we actually want to use for segmentation/thermal projection:
+
+FIRE
+----
+radius = 1.0 m
+radiusIsWorldSpace = True
+
+Use:
+    burn        -> flame mask
+    temperature -> thermal contribution
+
+The existing fire combustion model is preserved:
+    fuel = 0.8
+    temperature = 2.0
+    combustionEnabled = True
+
+DENSE SMOKE
+-----------
+radius = 1.0 m
+radiusIsWorldSpace = True
+
+Use:
+    smoke       -> smoke mask
+    temperature -> thermal contribution
+
+DenseSmoke is changed to inject a real native smoke field:
+    smoke = 1.0
+    coupleRateSmoke = 50.0
+
+DenseSmoke fuel injection is disabled so it behaves like smoke rather than an
+extra combustible fuel source:
+    fuel = 0.0
+    coupleRateFuel = 0.0
+
+The upward velocity is made explicitly WORLD-space:
+    velocity = (0, 0, 0.8)
+    velocityIsWorldSpace = True
+
+NanoVDB export channel switches are also prepared:
+    Fire:       burn + temperature
+    DenseSmoke: smoke + temperature
+
+IMPORTANT
+---------
+This script does NOT save the stage automatically.
+
+It stops the timeline at the end to clear the previous Flow state. After running:
+1. Press Play.
+2. Let Flow develop for about 3-5 seconds.
+3. Visually check the fire/smoke.
+4. Save the USD manually if you want to keep the settings.
+
+Run INSIDE Isaac Sim Script Editor.
+"""
+
+from pathlib import Path
+
+import omni.timeline
+import omni.usd
+from pxr import Gf
+
+
+# =============================================================================
+# PATHS
+# =============================================================================
+
+FIRE_EMITTER = (
+    "/Root/World/Meshes/hazards/Fire/flowEmitterSphere"
+)
+
+FIRE_EXPORT = (
+    "/Root/World/Meshes/hazards/Fire/"
+    "flowSimulate/nanoVdbExport"
+)
+
+SMOKE_EMITTER = (
+    "/Root/World/Meshes/hazards/DenseSmoke/flowEmitterSphere"
+)
+
+SMOKE_EXPORT = (
+    "/Root/World/Meshes/hazards/DenseSmoke/"
+    "flowSimulate/nanoVdbExport"
+)
+
+REPORT = Path(
+    "/scratch/apagnoux/"
+    "flow_sources_1m_channels_report.txt"
+)
+
+
+# =============================================================================
+# TARGET SETTINGS
+# =============================================================================
+
+FIRE_RADIUS_M = 1.0
+SMOKE_RADIUS_M = 1.0
+
+# Preserve existing fire behavior.
+FIRE_FUEL = 0.8
+FIRE_TEMPERATURE = 2.0
+FIRE_COUPLE_FUEL = 2.0
+FIRE_COUPLE_TEMPERATURE = 10.0
+
+# Make DenseSmoke populate a real smoke-density channel.
+SMOKE_DENSITY = 1.0
+SMOKE_COUPLE = 50.0
+
+SMOKE_TEMPERATURE = 0.5
+SMOKE_COUPLE_TEMPERATURE = 50.0
+
+SMOKE_VELOCITY_MPS = 0.8
+
+
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+def require_prim(stage, path):
+    prim = stage.GetPrimAtPath(path)
+
+    if not prim.IsValid():
+        raise RuntimeError(
+            f"Missing prim: {path}"
+        )
+
+    return prim
+
+
+def set_attr(prim, name, value, lines):
+    attr = prim.GetAttribute(name)
+
+    if not attr.IsValid():
+        lines.append(
+            f"[MISSING] {prim.GetPath()} :: {name}"
+        )
+        return
+
+    before = attr.Get()
+
+    attr.Set(value)
+
+    after = attr.Get()
+
+    lines.append(
+        f"{prim.GetPath()} :: "
+        f"{name}: {before} -> {after}"
+    )
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+stage = omni.usd.get_context().get_stage()
+
+if stage is None:
+    raise RuntimeError(
+        "No USD stage is open."
+    )
+
+fire_emitter = require_prim(
+    stage,
+    FIRE_EMITTER,
+)
+
+fire_export = require_prim(
+    stage,
+    FIRE_EXPORT,
+)
+
+smoke_emitter = require_prim(
+    stage,
+    SMOKE_EMITTER,
+)
+
+smoke_export = require_prim(
+    stage,
+    SMOKE_EXPORT,
+)
+
+lines = [
+    "========== FLOW 1M + NATIVE CHANNEL CONFIG ==========",
+    "",
+    "FIRE",
+    "----",
+]
+
+
+# -----------------------------------------------------------------------------
+# FIRE — KEEP 1 m
+# -----------------------------------------------------------------------------
+
+set_attr(
+    fire_emitter,
+    "radius",
+    FIRE_RADIUS_M,
+    lines,
+)
+
+set_attr(
+    fire_emitter,
+    "radiusIsWorldSpace",
+    True,
+    lines,
+)
+
+# Preserve the existing combustible fire source.
+set_attr(
+    fire_emitter,
+    "fuel",
+    FIRE_FUEL,
+    lines,
+)
+
+set_attr(
+    fire_emitter,
+    "temperature",
+    FIRE_TEMPERATURE,
+    lines,
+)
+
+set_attr(
+    fire_emitter,
+    "coupleRateFuel",
+    FIRE_COUPLE_FUEL,
+    lines,
+)
+
+set_attr(
+    fire_emitter,
+    "coupleRateTemperature",
+    FIRE_COUPLE_TEMPERATURE,
+    lines,
+)
+
+# The emitter itself does not need to inject burn directly.
+# Burn should be generated by the Flow combustion model.
+set_attr(
+    fire_emitter,
+    "burn",
+    0.0,
+    lines,
+)
+
+set_attr(
+    fire_emitter,
+    "coupleRateBurn",
+    0.0,
+    lines,
+)
+
+# Export the two channels we need.
+set_attr(
+    fire_export,
+    "burnEnabled",
+    True,
+    lines,
+)
+
+set_attr(
+    fire_export,
+    "temperatureEnabled",
+    True,
+    lines,
+)
+
+set_attr(
+    fire_export,
+    "smokeEnabled",
+    False,
+    lines,
+)
+
+
+# -----------------------------------------------------------------------------
+# DENSE SMOKE — KEEP 1 m
+# -----------------------------------------------------------------------------
+
+lines += [
+    "",
+    "DENSE SMOKE",
+    "-----------",
+]
+
+set_attr(
+    smoke_emitter,
+    "radius",
+    SMOKE_RADIUS_M,
+    lines,
+)
+
+set_attr(
+    smoke_emitter,
+    "radiusIsWorldSpace",
+    True,
+    lines,
+)
+
+# Populate the actual Flow smoke-density field.
+set_attr(
+    smoke_emitter,
+    "smoke",
+    SMOKE_DENSITY,
+    lines,
+)
+
+set_attr(
+    smoke_emitter,
+    "coupleRateSmoke",
+    SMOKE_COUPLE,
+    lines,
+)
+
+# Keep the smoke slightly warm.
+set_attr(
+    smoke_emitter,
+    "temperature",
+    SMOKE_TEMPERATURE,
+    lines,
+)
+
+set_attr(
+    smoke_emitter,
+    "coupleRateTemperature",
+    SMOKE_COUPLE_TEMPERATURE,
+    lines,
+)
+
+# Do not inject combustible fuel from the standalone smoke emitter.
+set_attr(
+    smoke_emitter,
+    "fuel",
+    0.0,
+    lines,
+)
+
+set_attr(
+    smoke_emitter,
+    "coupleRateFuel",
+    0.0,
+    lines,
+)
+
+# Explicit world-up transport.
+set_attr(
+    smoke_emitter,
+    "velocity",
+    Gf.Vec3f(
+        0.0,
+        0.0,
+        SMOKE_VELOCITY_MPS,
+    ),
+    lines,
+)
+
+set_attr(
+    smoke_emitter,
+    "velocityIsWorldSpace",
+    True,
+    lines,
+)
+
+# Export the two channels we need.
+set_attr(
+    smoke_export,
+    "smokeEnabled",
+    True,
+    lines,
+)
+
+set_attr(
+    smoke_export,
+    "temperatureEnabled",
+    True,
+    lines,
+)
+
+set_attr(
+    smoke_export,
+    "burnEnabled",
+    False,
+    lines,
+)
+
+
+# -----------------------------------------------------------------------------
+# CLEAR OLD SIMULATION STATE
+# -----------------------------------------------------------------------------
+
+timeline = omni.timeline.get_timeline_interface()
+
+try:
+    timeline.stop()
+
+    lines += [
+        "",
+        "Timeline stopped.",
+        "Old Flow state cleared/reset.",
+        "",
+        "NEXT:",
+        "1. Press Play.",
+        "2. Let Flow develop for 3-5 seconds.",
+        "3. Check the fire and smoke visually.",
+        "4. Save the USD manually if correct.",
+        "",
+        "Native channel intent:",
+        "  Fire burn        -> flame mask",
+        "  Fire temperature -> fire thermal contribution",
+        "  Smoke smoke      -> smoke mask",
+        "  Smoke temperature-> smoke thermal contribution",
+    ]
+
+except Exception as exc:
+    lines += [
+        "",
+        f"Timeline stop warning: {exc}",
+        "Stop/Play manually to reset the old Flow state.",
+    ]
+
+
+REPORT.write_text(
+    "\n".join(lines) + "\n"
+)
+
+print(
+    "\n".join(lines)
+)
+
+print(
+    "\nReport:",
+    REPORT,
+)
